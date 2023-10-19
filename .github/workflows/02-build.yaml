@@ -1,0 +1,58 @@
+name: Build application
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: read
+
+jobs:
+  filter_tags:
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if the tag is valid
+        run: |
+          tag_name=${{ github.ref }}
+          if [[ ! "${tag_name}" =~ ^refs/tags/v\d+\.\d+\.\d+(-[a-zA-Z0-9]{1,10})?$ ]]; then
+            echo "::error::Invalid tag: ${tag_name}"
+          fi
+
+  build:
+    if: github.ref_type == 'tag'
+    needs:
+      - filter_tags
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin]
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          check-latest: true
+      - name: Get tag name
+        id: tag_name
+        run: |
+          tag_name="${GITHUB_REF#refs/tags/}"
+          echo "::set-output name=tag_name::${tag_name}"
+      - name: Build binary package arch ${{ matrix.os }}/${{ matrix.arch}}
+        run: |
+          go mod download
+          mkdir ${{ matrix.os }}
+          go build -ldflags="-X main.Commit=$(git rev-parse HEAD)" -a -o kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
+        env:
+          CGO_ENABLED: 0
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }} 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: kubernetes-storage-metrics-${{ steps.tag_name.outputs.tag_name }}
+          path: kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
+          if-no-files-found: error
+          retention-days: 1

@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: test-pv
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  mountOptions:
+  - nfsvers=4
+  - hard
+  - intr
+  nfs:
+    path: /export/path
+    server: nfs_server
+  persistentVolumeReclaimPolicy: Retain

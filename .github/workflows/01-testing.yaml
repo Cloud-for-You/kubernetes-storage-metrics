@@ -1,0 +1,77 @@
+name: Test application
+on:
+  workflow_dispatch: {}
+
+jobs:
+  linters:
+    name: linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          check-latest: true
+      - name: golangci-lint
+        # Switch back to the official action after this bug is fixed: https://github.com/golangci/golangci-lint/issues/3107
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.1
+          $(go env GOPATH)/bin/golangci-lint run --out-format=github-actions --timeout=15m --verbose
+
+  unit_tests:
+    name: unit-tests 
+    needs:
+      - linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          check-latest: true
+      - name: Run the tests
+        run: |
+           set -x
+           go version
+
+           echo mkdir ${{ runner.temp }}/coverage-binary.out
+           mkdir ${{ runner.temp }}/coverage-binary.out
+           CGO_ENABLED=0 go test -v ./... -covermode=count -test.gocoverdir=${{ runner.temp }}/coverage-binary.out
+           CGO_ENABLED=0 go tool covdata textfmt -i=${{ runner.temp }}/coverage-binary.out -o coverage.out
+
+  create_tag:
+    needs:
+      - linters
+      - unit_tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Get modified metadata
+        id: metadata
+        run: |
+          files_changed=$(git show --pretty="" --name-only)
+          version_bumps=$(echo "$files_changed" | grep project.yaml | xargs git show | grep -c "+version" || true)
+          if [["$version_bumps" -ne "1" ]]; then
+            echo "::error file=project.yaml,title=Detect change version::Detected changes in file without version bump in package.yaml"
+          fi
+          TAG=$(cat project.yaml | grep version | cut -d ":" -f2)
+          git tag -l "${TAG}"
+          if [[ "$?" -ne "0" ]]; then
+            echo "::error::Version existing"
+          fi
+      - name: Create tag
+        run: |
+          TAG=$(cat project.yaml | grep version | cut -d ":" -f2)
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a ${TAG} -m "Release ${TAG}"
+          git push origin ${TAG}
+          gh workflow run 02-build.yaml --ref ${TAG}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

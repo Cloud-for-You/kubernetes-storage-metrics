@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: deployment1
+  name: deployment1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: deployment1
+    spec:
+      containers:
+      - name: container1
+        image: busybox
+        command:
+          - 'sleep'
+          - '3600'
+        resources: 
+          requests:
+            cpu: 50m
+            memory: 4Mi
+          limits:
+            cpu: 250m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /test-pvc-1
+          name: test-pvc-1
+        - mountPath: /test-pvc-2
+          name: test-pvc-2
+      volumes:
+        - name: test-pvc-1
+          persistentVolumeClaim:
+            claimName: test-pvc
+        - name: test-pvc-2
+          emptyDir:
+            sizeLimit: 500Mi
+status: {}
