@@ -5,6 +5,8 @@ on:
     tags:
       - '*'
 
+extends: .github/workflow-environment.yaml
+
 permissions:
   contents: read
 

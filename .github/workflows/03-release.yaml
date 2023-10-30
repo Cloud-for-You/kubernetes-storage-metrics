@@ -1,10 +1,11 @@
 name: Release Go Binaries
-
 on:
   workflow_run:
     workflows: ["Build application"]
     types:
       - completed
+
+extends: .github/workflow-environment.yaml
 
 jobs:
   release:
