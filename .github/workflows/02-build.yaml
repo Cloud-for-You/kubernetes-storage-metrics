@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: kubernetes-storage-metrics-${{ steps.tag_name.outputs.release_tag }}
+          name: kubernetes-storage-metrics-${{ steps.version.outputs.full }}
           path: kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
           if-no-files-found: error
           retention-days: 1
