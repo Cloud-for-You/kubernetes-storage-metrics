@@ -12,6 +12,8 @@ jobs:
   filter_tags:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
+    outputs:
+      valid_tag: ${{ steps.version.outputs.is_valid }}
     steps:
       - name: Check if the tag is valid
         id: version
@@ -20,9 +22,9 @@ jobs:
           prefix: 'v'
 
   build:
-    if: steps.version.outputs.is_valid == 'true'
     needs:
       - filter_tags
+    if: ${{ needs.filter_tags.outputs.is_valid }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
