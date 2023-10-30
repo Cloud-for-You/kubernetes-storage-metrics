@@ -14,17 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check if the tag is valid
-        id: tag_name
-        run: |
-          tag_name="${GITHUB_REF#refs/tags/}"
-          echo ${tag_name}
-          if [[ ! "${tag_name}" =~ ^refs/tags/v\d+\.\d+\.\d+(-[a-zA-Z0-9]{1,10})?$ ]]; then
-            echo "::error::Invalid tag: ${tag_name}"
-            exit 1
-          else
-            echo "::set-output name=tag_name::${tag_name}"
-            exit 0
-          fi
+        id: version
+        uses: nowsprinting/check-version-format-action@v3
+        with:
+          prefix: 'v'
 
   build:
     if: github.ref_type == 'tag'
