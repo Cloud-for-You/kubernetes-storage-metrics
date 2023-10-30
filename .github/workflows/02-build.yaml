@@ -12,8 +12,6 @@ jobs:
   filter_tags:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
-    environment:
-      name: workflows-shared-environments
     steps:
       - name: Check if the tag is valid
         run: |
@@ -27,8 +25,6 @@ jobs:
     needs:
       - filter_tags
     runs-on: ubuntu-latest
-    environment:
-      name: workflows-shared-environments
     strategy:
       matrix:
         os: [linux, darwin]
@@ -40,11 +36,10 @@ jobs:
           go-version: '1.21'
           check-latest: true
       - name: Get tag name
+        id: tag_name
         run: |
-          if [[ "${RELEASE_TAG}" -ne "" ]]; then
-            tag_name="${GITHUB_REF#refs/tags/}"
-            echo "RELEASE_TAG=${tag_name}" >> $GITHUB_ENV
-          fi
+          tag_name="${GITHUB_REF#refs/tags/}"
+          echo "::set-output name=tag_name::${tag_name}"
       - name: Build binary package arch ${{ matrix.os }}/${{ matrix.arch}}
         run: |
           go mod download
@@ -57,7 +52,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: kubernetes-storage-metrics-${RELEASE_TAG}
+          name: kubernetes-storage-metrics-${{ steps.tag_name.outputs.release_tag }}
           path: kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
           if-no-files-found: error
           retention-days: 1

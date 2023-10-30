@@ -48,8 +48,6 @@ jobs:
       - linters
       - unit_tests
     runs-on: ubuntu-latest
-    environment:
-      name: workflows-shared-environments
     steps:
       - uses: actions/checkout@v3
         with:
@@ -66,15 +64,14 @@ jobs:
           git tag -l "${tag_name}"
           if [[ "$?" -ne "0" ]]; then
             echo "::error::Version existing"
-          else
-            echo "RELEASE_TAG=${tag_name}" >> $GITHUB_ENV
           fi
       - name: Create tag
         run: |
+          TAG=$(cat project.yaml | grep version | cut -d ":" -f2)
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git tag -a ${RELEASE_TAG} -m "Release ${RELEASE_TAG}"
-          git push origin ${RELEASE_TAG}
-          gh workflow run 02-build.yaml --ref ${RELEASE_TAG}
+          git tag -a ${TAG} -m "Release ${TAG}"
+          git push origin ${TAG}
+          gh workflow run 02-build.yaml --ref ${TAG}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -9,16 +9,14 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment:
-      name: workflows-shared-environments
+
     steps:
       - uses: actions/checkout@v3
       - name: Download Artifact
         uses: actions/download-artifact@v2
         with:
-          name: kubernetes-storage-metrics-${RELEASE_TAG}
+          name: kubernetes-storage-metrics-${{ github.ref }}
           path: kubernetes-storage-metrics
-
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
