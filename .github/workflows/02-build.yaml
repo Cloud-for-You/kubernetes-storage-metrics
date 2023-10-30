@@ -12,6 +12,8 @@ jobs:
   filter_tags:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
+    environment:
+      name: workflows-shared-environments
     steps:
       - name: Check if the tag is valid
         run: |
@@ -25,6 +27,8 @@ jobs:
     needs:
       - filter_tags
     runs-on: ubuntu-latest
+    environment:
+      name: workflows-shared-environments
     strategy:
       matrix:
         os: [linux, darwin]
@@ -38,8 +42,14 @@ jobs:
       - name: Get tag name
         id: tag_name
         run: |
-          tag_name="${GITHUB_REF#refs/tags/}"
-          echo "::set-output name=tag_name::${tag_name}"
+          if [[ "${RELEASE_TAG}" -ne ""]]; then
+            tag_name=${RELEASE_TAG}
+            echo "::set-output name=tag_name::${tag_name}"
+          else
+            tag_name="${GITHUB_REF#refs/tags/}"
+            echo "::set-output name=tag_name::${tag_name}"
+            echo "RELEASE_TAG=${tag_name}" >> $GITHUB_ENV
+          fi
       - name: Build binary package arch ${{ matrix.os }}/${{ matrix.arch}}
         run: |
           go mod download
