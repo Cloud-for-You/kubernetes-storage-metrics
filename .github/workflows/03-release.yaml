@@ -10,16 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: kubernetes-storage-metrics-${{ github.ref }}
-          path: kubernetes-storage-metrics
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: kubernetes-storage-metrics/*
+      - name: debug all variable
+        run:  |
+          echo "Aktuální prostředí:"
+          printenv # Vypíše aktuální prostředí
+          echo "Dostupné proměnné:"
+          env  # Vypíše všechny dostupné proměnné
+
+#      - name: Download Artifact
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: kubernetes-storage-metrics-${{ github.ref }}
+#          path: kubernetes-storage-metrics
+#      - name: Create Release
+#        id: create_release
+#        uses: softprops/action-gh-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          files: kubernetes-storage-metrics/*
+#
