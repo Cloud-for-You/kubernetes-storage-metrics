@@ -42,12 +42,11 @@ jobs:
       - name: Get tag name
         id: tag_name
         run: |
-          if [[ "${RELEASE_TAG}" -ne ""]]; then
-            tag_name=${RELEASE_TAG}
-            echo "::set-output name=tag_name::${tag_name}"
+          if [[ "${RELEASE_TAG}" -ne "" ]]; then
+            echo "::set-output name=release_tag::${RELEASE_TAG}"
           else
             tag_name="${GITHUB_REF#refs/tags/}"
-            echo "::set-output name=tag_name::${tag_name}"
+            echo "::set-output name=releae_tag::${tag_name}"
             echo "RELEASE_TAG=${tag_name}" >> $GITHUB_ENV
           fi
       - name: Build binary package arch ${{ matrix.os }}/${{ matrix.arch}}
@@ -62,7 +61,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: kubernetes-storage-metrics-${{ steps.tag_name.outputs.tag_name }}
+          name: kubernetes-storage-metrics-${{ steps.tag_name.outputs.release_tag }}
           path: kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
           if-no-files-found: error
           retention-days: 1

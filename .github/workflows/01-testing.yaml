@@ -62,12 +62,12 @@ jobs:
           if [["$version_bumps" -ne "1" ]]; then
             echo "::error file=project.yaml,title=Detect change version::Detected changes in file without version bump in package.yaml"
           fi
-          TAG=$(cat project.yaml | grep version | cut -d ":" -f2)
-          git tag -l "${TAG}"
+          tag_name=$(cat project.yaml | grep version | cut -d ":" -f2)
+          git tag -l "${tag_name}"
           if [[ "$?" -ne "0" ]]; then
             echo "::error::Version existing"
           else
-            echo "RELEASE_TAG=${TAG}" >> $GITHUB_ENV
+            echo "RELEASE_TAG=${tag_name}" >> $GITHUB_ENV
           fi
       - name: Create tag
         run: |
