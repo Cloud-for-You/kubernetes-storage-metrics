@@ -24,7 +24,7 @@ jobs:
   build:
     needs:
       - filter_tags
-    if: ${{ needs.filter_tags.outputs.is_valid }}
+    if: ${{ needs.filter_tags.outputs.valid_tag }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
