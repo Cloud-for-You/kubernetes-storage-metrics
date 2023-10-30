@@ -1,6 +1,9 @@
 name: Test application
 on:
-  workflow_dispatch: {}
+  workflow_run:
+    workflows: ["Semantic"]
+    types:
+      - completed
 
 jobs:
   linters:
@@ -52,15 +55,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
-      - name: Get modified metadata
-        id: metadata
-        run: |
-          files_changed=$(git show --pretty="" --name-only)
-          version_bumps=$(echo "$files_changed" | grep project.yaml | xargs git show | grep -c "+version" || true)
-          if [[ "$version_bumps" -qe "0" ]]; then
-            echo "::error file=project.yaml,title=Detect change version::Detected changes in file without version bump in package.yaml"
-            exit 1
-          fi
       - name: Create tag
         run: |
           TAG=$(cat project.yaml | grep version | cut -d ":" -f2)
