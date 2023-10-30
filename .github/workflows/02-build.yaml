@@ -20,7 +20,7 @@ jobs:
           prefix: 'v'
 
   build:
-    if: github.ref_type == 'tag'
+    if: steps.version.outputs.is_valid == 'true'
     needs:
       - filter_tags
     runs-on: ubuntu-latest
