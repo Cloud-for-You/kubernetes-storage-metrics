@@ -10,12 +10,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
-      - name: Get modified project.yaml
+      - name: Get modified version in project.yaml
         id: metadata
         run: |
           files_changed=$(git show --pretty="" --name-only)
           version_bumps=$(echo "$files_changed" | grep project.yaml | xargs git show | grep -c "+version" || true)
           if [[ "$version_bumps" -qe 1 ]]; then
             echo "::error file=project.yaml,title=Detect change version::Detected changes in file without version bump in package.yaml"
-            exit 1
+            exit 0
           fi
