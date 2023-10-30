@@ -2,8 +2,6 @@ name: Test application
 on:
   workflow_dispatch: {}
 
-extends: .github/workflow-environment.yaml
-
 jobs:
   linters:
     name: linters
