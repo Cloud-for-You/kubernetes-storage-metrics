@@ -14,10 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check if the tag is valid
+        id: tag_name
         run: |
-          tag_name=${{ github.ref }}
+          tag_name="${GITHUB_REF#refs/tags/}"
+          echo ${tag_name}
           if [[ ! "${tag_name}" =~ ^refs/tags/v\d+\.\d+\.\d+(-[a-zA-Z0-9]{1,10})?$ ]]; then
             echo "::error::Invalid tag: ${tag_name}"
+            exit 1
+          else
+            echo "::set-output name=tag_name::${tag_name}"
+            exit 0
           fi
 
   build:
@@ -35,11 +41,6 @@ jobs:
         with:
           go-version: '1.21'
           check-latest: true
-      - name: Get tag name
-        id: tag_name
-        run: |
-          tag_name="${GITHUB_REF#refs/tags/}"
-          echo "::set-output name=tag_name::${tag_name}"
       - name: Build binary package arch ${{ matrix.os }}/${{ matrix.arch}}
         run: |
           go mod download
