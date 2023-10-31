@@ -9,10 +9,9 @@ jobs:
       matrix:
         platform:
           - linux/amd64
-          - linux/386
-          - linux/arm/v6
-          - linux/arm/v7
           - linux/arm64
+          - darwin/amd64
+          - darwin/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -25,7 +24,7 @@ jobs:
       - name: Set cache name
         id: cache-name
         run: |
-          echo 'cache-name=${{ github.ref_name }}-cache-${{ matrix.platform }}' | sed 's:/:-:g' >> $GITHUB_OUTPUT
+          echo 'cache-name=kubernetes-storage-metrics-cache-${{ matrix.platform }}' | sed 's:/:-:g' >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -34,12 +33,12 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: kubernetes-storage-metrics:${{ github.ref_name }}
           cache-from: type=gha
-          cache-to: type=local,dest=/tmp/${{ github.ref_name }}-cache,mode=max
+          cache-to: type=local,dest=/tmp/kubernetes-storage-metrics-cache,mode=max
       - name: Upload cache
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.ref_name }}-cache-${{ steps.cache-name.outputs.cache-name }}
-          path: /tmp/${{ github.ref_name }}-cache
+          name: ${{ steps.cache-name.outputs.cache-name }}
+          path: /tmp/kubernetes-storage-metrics-cache
           if-no-files-found: error
           retention-days: 1
 
