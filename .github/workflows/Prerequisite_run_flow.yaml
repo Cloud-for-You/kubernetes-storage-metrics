@@ -1,4 +1,4 @@
-name: Semantic
+name: Prerequisite
 on:
   workflow_dispatch: {}
 

@@ -1,7 +1,7 @@
 name: Test application
 on:
   workflow_run:
-    workflows: ["Semantic"]
+    workflows: ["Prerequisite"]
     types:
       - completed
 
