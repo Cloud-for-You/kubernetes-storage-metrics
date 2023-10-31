@@ -9,6 +9,7 @@ WORKDIR /src
 COPY . .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-X main.Commit=$(git rev-parse HEAD)" -a -o ${BINARYNAME:-prometheus-metrics-exporter} main.go
+RUN echo ${PWD} && ls -lR 
 
 # Build distroless container from binary
 FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
