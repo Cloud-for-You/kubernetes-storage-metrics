@@ -13,3 +13,14 @@ jobs:
           REPO_NAME=${GITHUB_REPOSITORY#*/}
           echo "Název repozitáře: $REPO_NAME"
           echo "Cesta ke kořenu repozitáře: $GITHUB_WORKSPACE"
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            quay.io/cloud-for-you/kubernetes-storage-metrics
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
