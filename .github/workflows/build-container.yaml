@@ -32,7 +32,7 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          tags: ${{ github.ref_name }}
+          tags: kubernetes-storage-metrics:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=local,dest=/tmp/${{ github.ref_name }}-cache,mode=max
       - name: Upload cache
