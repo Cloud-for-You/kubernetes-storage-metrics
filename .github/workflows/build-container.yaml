@@ -30,7 +30,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ${{ github.ref_name }}
+          context: .
           platforms: ${{ matrix.platform }}
           tags: ${{ github.ref_name }}
           cache-from: type=gha
