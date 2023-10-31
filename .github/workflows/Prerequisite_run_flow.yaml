@@ -4,8 +4,8 @@ on:
 
 jobs:
   semantic:
-    name: check required steps
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
         with:

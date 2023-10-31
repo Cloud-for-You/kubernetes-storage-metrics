@@ -1,0 +1,45 @@
+name: Build container
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/386
+          - linux/arm/v6
+          - linux/arm/v7
+          - linux/arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set cache name
+        id: cache-name
+        run: |
+          echo "::set-output name=cache-name::$(echo ${{ github.ref_name }}-cache-${{ matrix.platform }} | sed 's:/:-:g')"
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ github.ref_name }}
+          platforms: ${{ matrix.platform }}
+          tags: ${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=local,dest=/tmp/${{ github.ref_name }}-cache,mode=max
+      - name: Upload cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.ref_name }}-cache-${{ steps.cache-name.outputs.cache-name }}
+          path: /tmp/${{ github.ref_name }}-cache
+          if-no-files-found: error
+          retention-days: 1
+
+      
