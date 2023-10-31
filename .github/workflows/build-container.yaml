@@ -58,10 +58,10 @@ jobs:
           path: /tmp/kubernetes-storage-metrics-cache
 
       - name: Login to QUAY.IO
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           registry: quay.io
-          username: ${{ env.QUAY_USERNAME }}
+          username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
       #- name: Build and push
