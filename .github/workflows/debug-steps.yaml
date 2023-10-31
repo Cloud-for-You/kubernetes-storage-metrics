@@ -8,6 +8,7 @@ jobs:
     steps:
       - name: Print all variable
         run: |
+          echo ${{ github.repository_owner }}
           ORGANIZATION_NAME=$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY" | jq -r .organization.login)
           echo "Název organizace: $ORGANIZATION_NAME"
           REPO_NAME=${GITHUB_REPOSITORY#*/}
