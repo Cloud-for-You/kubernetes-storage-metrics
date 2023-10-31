@@ -8,12 +8,8 @@ jobs:
     steps:
       - name: Print all variable
         run: |
-          echo ${{ github.repository_owner }}
-          ORGANIZATION_NAME=$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY" | jq -r .organization.login)
-          echo "Název organizace: $ORGANIZATION_NAME"
-          REPO_NAME=${GITHUB_REPOSITORY#*/}
-          echo "Název repozitáře: $REPO_NAME"
-          echo "Cesta ke kořenu repozitáře: $GITHUB_WORKSPACE"
+          echo Organization/Owner name: ${{ github.repository_owner }}
+          echo Repository name: ${{ github.repository }}
 
       - name: Docker meta
         id: meta
