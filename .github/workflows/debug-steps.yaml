@@ -6,17 +6,18 @@ jobs:
   debug_steps:
     runs-on: ubuntu-latest
     steps:
-      - name: Print all variable
-        run: |
-          echo Organization/Owner name: ${{ github.repository_owner }}
-          echo Repository name: ${{ github.repository }}
+      - name: Get lowercase GitHub username
+        id: repository_owner
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ github.repository }}
 
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
-            quay.io/cloud-for-you/kubernetes-storage-metrics
+            quay.io/${{ steps.repository_owner.outputs.lowercase }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
