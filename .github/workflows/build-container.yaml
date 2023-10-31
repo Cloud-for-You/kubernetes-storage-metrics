@@ -25,7 +25,8 @@ jobs:
       - name: Set cache name
         id: cache-name
         run: |
-          echo "::set-output name=cache-name::$(echo ${{ github.ref_name }}-cache-${{ matrix.platform }} | sed 's:/:-:g')"
+          echo 'cache-name=${{ github.ref_name }}-cache-${{ matrix.platform }}' | sed 's:/:-:g' >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
