@@ -8,8 +8,8 @@ jobs:
     steps:
       - name: Print all variable
         run: |
+          ORGANIZATION_NAME=$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY" | jq -r .organization.login)
+          echo "Název organizace: $ORGANIZATION_NAME"
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-          OWNER_OR_ORGANIZATION=$GITHUB_ACTOR
-          echo "Organizace nebo vlastník repozitáře: $OWNER_OR_ORGANIZATION"
           echo "Název repozitáře: $REPO_NAME"
           echo "Cesta ke kořenu repozitáře: $GITHUB_WORKSPACE"
