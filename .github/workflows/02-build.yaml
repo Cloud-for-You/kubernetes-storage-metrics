@@ -1,4 +1,4 @@
-name: Build application
+name: "[02] Build application"
 on:
   workflow_dispatch: {}
   push:

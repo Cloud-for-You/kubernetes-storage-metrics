@@ -1,4 +1,4 @@
-name: Test application
+name: "[01] Test application"
 on:
   workflow_run:
     workflows: ["Prerequisite"]

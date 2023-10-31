@@ -1,7 +1,7 @@
-name: Release Go Binaries
+name: "[03] Release Go Binaries"
 on:
   workflow_run:
-    workflows: ["Build application"]
+    workflows: ["[02] Build application"]
     types:
       - completed
 
