@@ -14,5 +14,5 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-X ma
 FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
 LABEL org.opencontainers.image.source="https://github.com/Cloud-for-You/kubernetes-storage-metrics"
 WORKDIR /
-COPY --from=builder /src/${BINARYNAME:-prometheus-metrics-exporter} .
+COPY --from=builder /src/${BINARYNAME:-prometheus-metrics-exporter} /
 ENTRYPOINT ["/${BINARYNAME:-prometheus-metrics-exporter}"]
