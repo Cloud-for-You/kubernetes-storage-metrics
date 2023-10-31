@@ -1,0 +1,13 @@
+name: Debugging steps
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print all variable
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          echo "Název repozitáře: $REPO_NAME"
+          echo "Cesta ke kořenu repozitáře: $GITHUB_WORKSPACE"
