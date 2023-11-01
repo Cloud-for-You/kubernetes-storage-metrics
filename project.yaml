@@ -1,3 +1,0 @@
-name: kubernetes-storage-metrics
-description: Export prometheus metrics for ephemeral and pvcRef volume
-version: v1.0.0
