@@ -1,55 +1,7 @@
-name: "[02] Build application"
+name: Build
 on:
-  workflow_dispatch: {}
-  push:
-    tags:
-      - '*'
-
-permissions:
-  contents: read
+  workflow_dispatch:
 
 jobs:
-  filter_tags:
-    if: github.ref_type == 'tag'
-    runs-on: ubuntu-latest
-    outputs:
-      valid_tag: ${{ steps.version.outputs.is_valid }}
-      tag_name: ${{ steps.version.outputs.full }}
-    steps:
-      - name: Check if the tag is valid
-        id: version
-        uses: nowsprinting/check-version-format-action@v3
-        with:
-          prefix: 'v'
-
-  build:
-    needs:
-      - filter_tags
-    if: ${{ needs.filter_tags.outputs.valid_tag }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [linux, darwin]
-        arch: [amd64, arm64]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v4
-        with:
-          go-version: '1.21'
-          check-latest: true
-      - name: Build binary package arch ${{ matrix.os }}/${{ matrix.arch}}
-        run: |
-          go mod download
-          mkdir ${{ matrix.os }}
-          go build -ldflags="-X main.Commit=$(git rev-parse HEAD)" -a -o kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
-        env:
-          CGO_ENABLED: 0
-          GOOS: ${{ matrix.os }}
-          GOARCH: ${{ matrix.arch }} 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: kubernetes-storage-metrics-${{ needs.filter_tags.outputs.tag_name }}
-          path: kubernetes-storage-metrics-${{ matrix.os }}-${{ matrix.arch }}
-          if-no-files-found: error
-          retention-days: 1
+  build-image-container:
+    uses: Cloud-for-You/github-workflows/.github/workflows/build-go-container.yaml@main
