@@ -3,8 +3,16 @@ Get prometheus metrics for PODs in kubernetes cluster
 
 Source: https://github.com/jmcgrath207/k8s-ephemeral-storage-metrics
 
-### Metriky
+### Environments
+Name | Comment | Type
+---|---|---
+LOG_LEVEL | Úrověň logování | string
+IN_CLUSTER | Pokud se spustěný kód nachází mimo cluster, je potřeba nastavit na hodnotu true | bool
+CURRENT_NODE_NAME | Jméno monitorovaného workeru | string
+SCRAPE_DURATION | Interval scrapování dat z clusteru | string
+METRICS_PORT | HTTP port na kter0m budou dostupné metriky | int
 
+### Metrics
 Name | Commment | Type
 ---|---|---
 ephemeral_storage_pod_available | Dostupna kapacita ephemeral storage v PODu | gauge
