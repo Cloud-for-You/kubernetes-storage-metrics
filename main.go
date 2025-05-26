@@ -198,7 +198,7 @@ func getEphemeralMetrics() {
 		// Get data
 		content, err := clientset.RESTClient().Get().AbsPath(fmt.Sprintf("/api/v1/nodes/%s/proxy/stats/summary", currentNode)).DoRaw(context.Background())
 		if err != nil {
-			log.Error().Msg(fmt.Sprintf("ErrorBadRequst : %s\n", err.Error()))
+			log.Error().Msg(fmt.Sprintf("ErrorBadRequest : %s\n", err.Error()))
 			os.Exit(1)
 		}
 		log.Debug().Msg(fmt.Sprintf("Fetched proxy stats from node : %s", currentNode))
