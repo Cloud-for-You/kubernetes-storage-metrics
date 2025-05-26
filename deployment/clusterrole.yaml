@@ -6,14 +6,9 @@ rules:
 - apiGroups:
     - ""
   resources: 
-    - pods
     - nodes
-    - persistentvolumes
-    - persistentvolumeclaims
   verbs:
     - get
-    - list
-    - watch
 - apiGroups:
     - ""
   resources:
