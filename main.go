@@ -24,7 +24,6 @@ var (
 	inCluster      string
 	clientset      *kubernetes.Clientset
 	currentNode    string
-	sampleInterval int64
 )
 
 type LineInfoHook struct{}
