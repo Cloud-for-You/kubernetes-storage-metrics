@@ -383,7 +383,7 @@ func main() {
 	go getVolumeMetrics()
 
 	// setup HTTP server
-	port := getEnv("METRICS_PORT", "9100")
+	port := getEnv("METRICS_PORT", "8080")
 	http.Handle("/metrics", promhttp.Handler())
 	log.Info().Msg(fmt.Sprintf("Starting server listening on :%s", port))
 	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)

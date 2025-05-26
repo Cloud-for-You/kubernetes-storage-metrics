@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: kubernetes-storage-metrics
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: kubernetes-storage-metrics
+  namespaceSelector:
+    any: true
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s

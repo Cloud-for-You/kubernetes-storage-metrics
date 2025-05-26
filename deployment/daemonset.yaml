@@ -23,7 +23,7 @@ spec:
         - name: SCRAPE_DURATION
           value: "15s"
         ports:
-        - containerPort: 9100
+        - containerPort: 8080
           name: metrics
           protocol: TCP
         resources:
