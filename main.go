@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -139,6 +138,7 @@ func getK8sClient() {
 }
 
 func getEphemeralMetrics() {
+	log.Debug().Msg("Starting Ephemeral Storage metrics collection")
 	usedQueued := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "ephemeral_storage_pod_usage",
 		Help: "Used to expose Ephemeral Storage metrics for pod ",
@@ -191,7 +191,13 @@ func getEphemeralMetrics() {
 	prometheus.MustRegister(availableQueued)
 
 	currentNode = getEnv("CURRENT_NODE_NAME", "")
-	sampleInterval, _ = strconv.ParseInt(getEnv("SCRAPE_INTERVAL", "15"), 2, 64)
+	intervalStr := getEnv("SCRAPE_DURATION", "15s")
+	interval, err := time.ParseDuration(intervalStr)
+	if err != nil {
+		log.Warn().Msgf("Invalid SCRAPE_DURATION '%s', using default 15s", intervalStr)
+		interval = 15 * time.Second
+	}
+	sampleInterval := interval.Seconds()
 
 	for {
 		start := time.Now()
@@ -228,15 +234,18 @@ func getEphemeralMetrics() {
 		}
 
 		// Use sleep
-		elapsedTime := time.Since(start).Milliseconds() / 1000
+		elapsedTime := float64(time.Since(start).Milliseconds()) / 1000
 		adjustTime := sampleInterval - elapsedTime
-		log.Debug().Msgf("Adjusted Poll time: %d seconds", adjustTime)
-		log.Debug().Msgf("Time Now: %d mil", elapsedTime)
-		time.Sleep(time.Duration(adjustTime) * time.Second)
+		log.Debug().Msgf("Adjusted Poll time: %f seconds", adjustTime)
+		log.Debug().Msgf("Time Now: %f mil", elapsedTime)
+		if adjustTime > 0 {
+			time.Sleep(time.Duration(adjustTime * float64(time.Second)))
+		}
 	}
 }
 
 func getVolumeMetrics() {
+	log.Debug().Msg("Starting Volume Storage metrics collection")
 	usedQueued := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "volume_storage_pod_usage",
 		Help: "Used to expose Volume Storage metrics for pod ",
@@ -301,7 +310,13 @@ func getVolumeMetrics() {
 	prometheus.MustRegister(availableQueued)
 
 	currentNode = getEnv("CURRENT_NODE_NAME", "")
-	sampleInterval, _ = strconv.ParseInt(getEnv("SCRAPE_INTERVAL", "15"), 2, 64)
+	intervalStr := getEnv("SCRAPE_DURATION", "15s")
+	interval, err := time.ParseDuration(intervalStr)
+	if err != nil {
+		log.Warn().Msgf("Invalid SCRAPE_DURATION '%s', using default 15s", intervalStr)
+		interval = 15 * time.Second
+	}
+	sampleInterval := interval.Seconds()
 
 	for {
 		start := time.Now()
@@ -346,11 +361,13 @@ func getVolumeMetrics() {
 		}
 
 		// Use sleep
-		elapsedTime := time.Since(start).Milliseconds() / 1000
+		elapsedTime := float64(time.Since(start).Milliseconds()) / 1000
 		adjustTime := sampleInterval - elapsedTime
-		log.Debug().Msgf("Adjusted Poll time: %d seconds", adjustTime)
-		log.Debug().Msgf("Time Now: %d mil", elapsedTime)
-		time.Sleep(time.Duration(adjustTime) * time.Second)
+		log.Debug().Msgf("Adjusted Poll time: %f seconds", adjustTime)
+		log.Debug().Msgf("Time Now: %f mil", elapsedTime)
+		if adjustTime > 0 {
+			time.Sleep(time.Duration(adjustTime * float64(time.Second)))
+		}
 	}
 }
 
