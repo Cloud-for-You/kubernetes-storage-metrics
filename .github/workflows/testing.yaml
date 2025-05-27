@@ -105,12 +105,13 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - uses: actions/checkout@v4
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
           branch: ${{ github.ref_name }}
           base: dev
-          title: 'Automaticky vytvořený pull request'
-          body: 'Tento PR byl vytvořen automaticky po úspěšném průběhu CI pipeline.'
-          commit-message: 'Automatický PR z CI'
+          title: 'Update dev branch'
+          body: 'This PR updates the dev branch with the latest changes.'
+          commit-message: 'Update dev branch'
           draft: false
