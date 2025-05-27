@@ -110,6 +110,7 @@ jobs:
         id: open-pr
         uses: devops-infra/action-pull-request@v0.6.0
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: ${{ github.ref_name }}
           target_branch: dev
       - name: Check outputs
