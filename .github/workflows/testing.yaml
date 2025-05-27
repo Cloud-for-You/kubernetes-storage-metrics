@@ -1,0 +1,35 @@
+name: Testing
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+      - dev
+
+permissions:
+  contents: read
+
+jobs:
+  static-code-analysis:
+    name: Static code analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.58
+          args: --timeout=30m --config=.golangci.yml --issues-exit-code=0
+  integration-tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
