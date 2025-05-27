@@ -37,9 +37,11 @@ jobs:
           go-version-file: go.mod
           cache: false
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1
+        uses: container-tools/kind-action@v1
         with:
-          version: v1.12.0
+          version: v2.0.4
+          cluster_name: kind
+          registry: false
 
   create-pull-request:
     name: Create pull request
