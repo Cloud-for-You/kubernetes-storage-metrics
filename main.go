@@ -21,23 +21,23 @@ import (
 )
 
 var (
-	inCluster      string
-	clientset      *kubernetes.Clientset
-	currentNode    string
+	incluster   string
+	clientset   *kubernetes.Clientset
+	currentNode string
 )
 
 type LineInfoHook struct{}
 
 type pvcRef struct {
-	Name           string `json:"name"`
+	Name string `json:"name"`
 }
 
 type volumeStats struct {
-	Name           string `json:"name"`	
+	Name           string  `json:"name"`
 	AvailableBytes float64 `json:"availableBytes"`
 	CapacityBytes  float64 `json:"capacityBytes"`
 	UsedBytes      float64 `json:"usedBytes"`
-	PvcRef         pvcRef `json:"pvcRef"`
+	PvcRef         pvcRef  `json:"pvcRef"`
 }
 
 type ephemeralStorageMetrics struct {
@@ -66,7 +66,7 @@ type volumeStorageMetrics struct {
 			Name      string `json:"name"`
 			Namespace string `json:"namespace"`
 		}
-		Volumes			[]volumeStats `json:"volume"`         
+		Volumes []volumeStats `json:"volume"`
 	}
 }
 
@@ -94,9 +94,9 @@ func setLogger() {
 }
 
 func getK8sClient() {
-	inCluster = getEnv("IN_CLUSTER", "true")
+	incluster = getEnv("IN_CLUSTER", "true")
 
-	if inCluster == "true" {
+	if incluster == "true" {
 
 		config, err := rest.InClusterConfig()
 		if err != nil {
@@ -224,7 +224,7 @@ func getEphemeralMetrics() {
 			if podNamespace == "" || (usedBytes == 0 && availableBytes == 0 && capacityBytes == 0) {
 				log.Warn().Msg(fmt.Sprintf("pod %s/%s on %s has no metrics on its ephemeral storage usage", podName, podNamespace, nodeName))
 			}
-			
+
 			usedQueued.With(prometheus.Labels{"job": "kubernetes-storage-metrics", "namespace": podNamespace, "pod": podName, "node": nodeName}).Set(usedBytes)
 			capacityQueued.With(prometheus.Labels{"job": "kubernetes-storage-metrics", "namespace": podNamespace, "pod": podName, "node": nodeName}).Set(capacityBytes)
 			availableQueued.With(prometheus.Labels{"job": "kubernetes-storage-metrics", "namespace": podNamespace, "pod": podName, "node": nodeName}).Set(availableBytes)
@@ -339,7 +339,7 @@ func getVolumeMetrics() {
 
 			for _, volume := range pod.Volumes {
 				if volume.PvcRef.Name != "" {
-					volumeName := volume.Name 
+					volumeName := volume.Name
 					pvcName := volume.PvcRef.Name
 					usedBytes := volume.UsedBytes
 					capacityBytes := volume.CapacityBytes
@@ -356,7 +356,7 @@ func getVolumeMetrics() {
 					log.Debug().Msg(fmt.Sprintf("pod %s/%s on %s with usedBytes: %f", podNamespace, podName, nodeName, usedBytes))
 				}
 			}
-			
+
 		}
 
 		// Use sleep
