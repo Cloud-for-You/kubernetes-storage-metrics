@@ -8,8 +8,6 @@ spec:
   selector:
     matchLabels:
       app: kubernetes-storage-metrics
-  namespaceSelector:
-    any: true
   podMetricsEndpoints:
     - port: metrics
       path: /metrics
