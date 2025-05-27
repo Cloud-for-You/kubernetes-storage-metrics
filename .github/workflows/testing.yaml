@@ -14,12 +14,12 @@ jobs:
     name: Static code analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
+      - uses: actions/checkout@v4
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
@@ -30,13 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: static-code-analysis
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
+      - uses: actions/checkout@v4
       - name: Run unit tests
         run: |
           go test -v ./... -coverprofile=coverage.out -covermode=atomic
@@ -56,35 +54,47 @@ jobs:
     runs-on: ubuntu-latest
     needs: unit-tests
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
-      #- name: Create kind cluster
-      #  uses: engineerd/setup-kind@v0.6.2
-      #  with:
-      #    version: "v0.24.0"
-      #    wait: 180s
-      #    name: ${{ github.ref_name }}
-      #    verbosity: 3
+      - uses: alexellis/setup-arkade@v1
+      - uses: alexellis/arkade-get@master
+        with:
+          kubectl: latest
+          kustomize: latest
+          helm: latest
+          jq: latest
+          yq: latest
       - name: Setup KinD cluster
         run: |
           mkdir ${HOME}/bin
-          curl -Lo ${HOME}/bin/kubectl https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl
+          curl -L -s -o ${HOME}/bin/kubectl https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl
           chmod +x ${HOME}/bin/kubectl
-          curl -Lo ${HOME}/bin/kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
+          curl -L -s -o ${HOME}/bin/kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
           chmod +x ${HOME}/bin/kind
-          kind create cluster --name ${{ github.ref_name }} --image kindest/node:v1.31.0 --wait 180s
-          kubectl cluster-info --context kind-${{ github.ref_name }}
-        
-      - name: Testing
+          kind create cluster --name kind-${{ github.ref_name }} --image kindest/node:v1.31.0 --wait 180s
+      - name: Wait for KinD cluster to be ready
         run: |
-          kubectl cluster-info
-          kubectl version
-          kubectl get pods -n kube-system
+          ATTEMPTS=30
+          SLEEP=10
+          for i in $(seq 1 $ATTEMPTS); do
+            NOT_READY=$(kubectl get pods -n kube-system --no-headers | grep -v 'Running\|Completed' | wc -l)
+            if [ "$NOT_READY" -eq 0 ]; then
+              echo "All kube-system pods are running."
+              kubectl cluster-info
+              exit 0
+            fi
+            echo "Waiting for cluster to be ready... ($i/$ATTEMPTS)"
+            kubectl get pods -n kube-system
+            sleep $SLEEP
+          done
+          echo "Cluster is not ready after $((ATTEMPTS * SLEEP)) seconds."
+          exit 1
+      - uses: actions/checkout@v4
+      - name: Run integration tests
+        run: |
+          go test -v ./integration/... -coverprofile=coverage.out -covermode=atomic
 
   create-pull-request:
     name: Create pull request
