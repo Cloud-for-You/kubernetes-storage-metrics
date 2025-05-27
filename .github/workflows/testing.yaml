@@ -40,6 +40,11 @@ jobs:
         with:
           version: "v0.24.0"
           name: kind
+      - name: Testing
+        run: |
+          kubectl cluster-info
+          kubectl version
+          kubectl get pods -n kube-system
 
   create-pull-request:
     name: Create pull request
