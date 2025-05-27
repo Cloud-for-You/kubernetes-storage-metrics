@@ -30,7 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: static-code-analysis
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -55,16 +56,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: unit-tests
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
-      - uses: engineerd/setup-kind@v0.6.2
+      - name: Create kind cluster
+        uses: engineerd/setup-kind@v0.6.2
         with:
           version: "v0.24.0"
-          wait: 300s
+          wait: 180s
           name: ${{ github.ref_name }}
       - name: Testing
         run: |
@@ -78,7 +81,8 @@ jobs:
     needs: integration-tests
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
