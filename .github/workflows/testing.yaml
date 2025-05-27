@@ -57,6 +57,7 @@ jobs:
       - uses: alexellis/setup-arkade@v1
       - uses: alexellis/arkade-get@master
         with:
+          print-summary: false
           kubectl: latest
           kustomize: latest
           helm: latest
