@@ -74,9 +74,9 @@ jobs:
         run: |
           mkdir ${HOME}/bin
           curl -Lo ${HOME}/bin/kubectl https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl
-          chmod +x /usr/local/bin/kubectl
+          chmod +x ${HOME}/bin/kubectl
           curl -Lo ${HOME}/bin/kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
-          chmod +x /usr/local/bin/kind
+          chmod +x ${HOME}/bin/kind
           kind create cluster --name ${{ github.ref_name }} --image kindest/node:v1.31.0 --wait 180s
           kubectl cluster-info --context kind-${{ github.ref_name }}
         
