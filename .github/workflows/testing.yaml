@@ -24,11 +24,32 @@ jobs:
         uses: golangci/golangci-lint-action@v8
         with:
           args: --timeout=30m --config=.golangci.yaml --issues-exit-code=0
+
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    needs: static-code-analysis
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Run unit tests
+        run: |
+          go test -v ./... -coverprofile=coverage.out -covermode=atomic
+          go tool cover -func=coverage.out
+          go tool cover -html=coverage.out -o coverage.html
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
   
   integration-tests:
     name: Integration tests
     runs-on: ubuntu-latest
-    needs: static-code-analysis
+    needs: unit-tests
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
@@ -39,7 +60,8 @@ jobs:
       - uses: engineerd/setup-kind@v0.6.2
         with:
           version: "v0.24.0"
-          name: kind
+          wait: 300s
+          name: ${{ github.ref_name }}
       - name: Testing
         run: |
           kubectl cluster-info
