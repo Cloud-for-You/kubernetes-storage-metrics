@@ -1,10 +1,9 @@
 name: Build DEV version
 on:
   workflow_dispatch:
-  on:
-    push:
-      branches:
-        - dev
+  push:
+    branches:
+      - dev
 
 jobs:
   build-image-container:
