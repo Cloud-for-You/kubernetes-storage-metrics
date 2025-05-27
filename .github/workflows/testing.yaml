@@ -110,8 +110,8 @@ jobs:
         id: open-pr
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: ${{ github.ref_name }}
-          base: dev
+          branch: dev
+          base: ${{ github.ref_name }}
       - name: Check outputs
         if: ${{ steps.open-pr.outputs.pull-request-number }}
         run: |
