@@ -82,7 +82,6 @@ jobs:
               exit 0
             fi
             echo "Waiting for cluster to be ready... ($i/$ATTEMPTS)"
-            kubectl get pods -n kube-system
             sleep $SLEEP
           done
           echo "Cluster is not ready after $((ATTEMPTS * SLEEP)) seconds."
