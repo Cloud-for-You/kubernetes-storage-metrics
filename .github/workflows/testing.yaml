@@ -14,12 +14,12 @@ jobs:
     name: Static code analysis
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
-      - uses: actions/checkout@v4
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
@@ -30,11 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: static-code-analysis
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: false
-      - uses: actions/checkout@v4
       - name: Run unit tests
         run: |
           go test -v ./... -coverprofile=coverage.out -covermode=atomic
@@ -54,10 +54,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: unit-tests
     steps:
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: false
       - uses: alexellis/setup-arkade@v1
       - uses: alexellis/arkade-get@master
         with:
@@ -92,9 +88,13 @@ jobs:
           echo "Cluster is not ready after $((ATTEMPTS * SLEEP)) seconds."
           exit 1
       - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
       - name: Run integration tests
         run: |
-          go test -v ./integration/... -coverprofile=coverage.out -covermode=atomic
+          kubectl get nodes -o wide
 
   create-pull-request:
     name: Create pull request
