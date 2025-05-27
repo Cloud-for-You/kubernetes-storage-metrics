@@ -106,11 +106,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v4
+        id: open-pr
+        uses: peter-evans/create-pull-request@v7
         with:
-          branch: ${{ github.ref_name }}
           base: dev
-          title: 'Update dev branch'
-          body: 'This PR updates the dev branch with the latest changes.'
-          commit-message: 'Update dev branch'
-          draft: false
+      - name: Check outputs
+        if: ${{ steps.open-pr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.open-pr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.open-pr.outputs.pull-request-url }}"
