@@ -108,32 +108,28 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      #- name: Create pull request
-      #  id: open-pr
-      #  uses: devops-infra/action-pull-request@v0.6.0
-      #  with:
-      #    github_token: ${{ secrets.GITHUB_TOKEN }}
-      #    source_branch: ${{ github.ref_name }}
-      #    target_branch: dev
-      #- name: Check outputs
-      #  if: ${{ steps.open-pr.outputs.pr_number }}
-      #  run: |
-      #    echo "Pull Request Number - ${{ steps.open-pr.outputs.pr_number }}"
-      #    echo "Pull Request URL - ${{ steps.open-pr.outputs.url }}"
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
-        id: pull-request
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Automated PR from workflow"
-          body: "This PR was created automatically by the testing workflow."
-          base: dev
-          branch: ${{ github.ref_name }}
-          commit-message: "Automated commit from testing workflow"
-          labels: automated, testing
-          draft: false
-          delete-branch: false
-      - name: Check outputs
+      - name: Get commit list
+        id: commits
         run: |
-          echo "Pull Request URL - ${{ steps.pull-request.outputs.pull-request-url }}"
-          echo "Pull Request Number - ${{ steps.pull-request.outputs.pull-request-number }}"
+          echo "COMMITS<<EOF" >> $GITHUB_ENV
+          git log --pretty=format:"- %h %s" origin/dev..HEAD >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Create pull request
+        id: pull_request
+        uses: devops-infra/action-pull-request@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: ${{ github.ref_name }}
+          target_branch: dev
+          title: "Automated PR from ${{ github.ref_name }}"
+          body: |
+            This pull request was automatically created by the GitHub Actions workflow.
+            It includes the latest changes from the branch `${{ github.ref_name }}`.
+
+            ### Commits:
+            ${{ env.COMMITS }}
+      - name: Check outputs
+        if: ${{ steps.open-pr.outputs.pr_number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.pull_request.outputs.pr_number }}"
+          echo "Pull Request URL - ${{ steps.pull_request.outputs.url }}"
