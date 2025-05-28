@@ -111,9 +111,11 @@ jobs:
       - name: Get commit list
         id: commits
         run: |
-          echo "COMMITS<<EOF" >> $GITHUB_ENV
-          git log --pretty=format:"- %h %s" origin/dev..HEAD >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo 'COMMITS<<EOF'
+            git log --pretty=format:"- %h %s" origin/dev..HEAD
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
       - name: Create pull request
         id: pull_request
         uses: devops-infra/action-pull-request@v0.6.0
