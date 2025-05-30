@@ -130,7 +130,7 @@ jobs:
             ### Commits:
             ${{ steps.commits.outputs.COMMITS }}
       - name: Check outputs
-        if: ${{ steps.open-pr.outputs.pr_number }}
+        if: ${{ steps.pull_request.outputs.pr_number }}
         run: |
           echo "Pull Request Number - ${{ steps.pull_request.outputs.pr_number }}"
           echo "Pull Request URL - ${{ steps.pull_request.outputs.url }}"
