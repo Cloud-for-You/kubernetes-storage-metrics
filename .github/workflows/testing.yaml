@@ -124,11 +124,16 @@ jobs:
           target_branch: dev
           title: "Automated PR from ${{ github.ref_name }}"
           body: |
-            This pull request was automatically created by the GitHub Actions workflow.
-            It includes the latest changes from the branch `${{ github.ref_name }}`.
-
+            ### What changes does this pull request make?
+            This pull request includes the latest changes from the branch `${{ github.ref_name }}`.
+            
             ### Commits:
             ${{ steps.commits.outputs.COMMITS }}
+
+            ### Checklist:
+            - [ ] Code has been reviewed
+            - [ ] Tests have been run and passed
+            - [ ] Documentation has been updated if necessary
       - name: Check outputs
         if: ${{ steps.pull_request.outputs.pr_number }}
         run: |
