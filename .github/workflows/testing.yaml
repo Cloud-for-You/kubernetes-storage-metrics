@@ -111,11 +111,10 @@ jobs:
       - name: Get commit list
         id: commits
         run: |
-          {
-            echo 'COMMITS<<EOF'
-            git log --pretty=format:"- %h %s" origin/dev..HEAD
-            echo 'EOF'
-          } >> "$GITHUB_ENV"
+          commits=$(git log --pretty=format:"- %h %s" origin/dev..HEAD)
+          echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
+          echo "$commits" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Create pull request
         id: pull_request
         uses: devops-infra/action-pull-request@v0.6.0
@@ -129,7 +128,7 @@ jobs:
             It includes the latest changes from the branch `${{ github.ref_name }}`.
 
             ### Commits:
-            ${{ env.COMMITS }}
+            ${{ steps.commits.outputs.COMMITS }}
       - name: Check outputs
         if: ${{ steps.open-pr.outputs.pr_number }}
         run: |
