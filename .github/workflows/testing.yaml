@@ -108,13 +108,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Get commit list
-        id: commits
-        run: |
-          commits=$(git log --pretty=format:"- %h %s" origin/dev..HEAD)
-          echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
-          echo "$commits" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+      #- name: Get commit list
+      #  id: commits
+      #  run: |
+      #    commits=$(git log --pretty=format:"- %h %s" origin/dev..HEAD)
+      #    echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
+      #    echo "$commits" >> $GITHUB_OUTPUT
+      #    echo "EOF" >> $GITHUB_OUTPUT
       - name: Create pull request
         id: pull_request
         uses: devops-infra/action-pull-request@v0.6.0
@@ -123,13 +123,13 @@ jobs:
           source_branch: ${{ github.ref_name }}
           target_branch: dev
           title: "Automated PR from ${{ github.ref_name }}"
+          old_string: "**Write you description here**"
+          new_string: ${{ github.event.commits[0].message }}
+          get_diff: true
           body: |
-            ### What changes does this pull request make?
-            This pull request includes the latest changes from the branch `${{ github.ref_name }}`.
+            ### What changes:
+            **Write you description here**
             
-            ### Commits:
-            ${{ steps.commits.outputs.COMMITS }}
-
             ### Checklist:
             - [ ] Code has been reviewed
             - [ ] Tests have been run and passed
